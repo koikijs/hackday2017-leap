@@ -8,7 +8,7 @@
 	<properties>
 		<java.library.path>${project.basedir}/lib/</java.library.path>
 	</properties>
-<!-- 
+
 	<dependencies>
 		<dependency>
 			<groupId>koiki</groupId>
@@ -20,28 +20,19 @@
 	</dependencies>
 
 	<build>
-		<sourceDirectory>src</sourceDirectory>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.5.0</version>
 				<configuration>
-					<archive>
-						<manifest>
-							<mainClass>koiki.hackday2017.leap.Sample</mainClass>
-							<addClasspath>true</addClasspath>
-						</manifest>
-						<manifestEntries>
-							<Class-Path>./lib/LeapJava.jar</Class-Path>
-						</manifestEntries>
-					</archive>
+					<executable>maven</executable>
+					<mainClass>koiki.hackday2017.leap.Sample</mainClass>
+					<additionalClasspathElements>
+						<additionalClasspathElement>${project.basedir}/lib/LeapJava.jar</additionalClasspathElement>
+					</additionalClasspathElements>
 				</configuration>
 			</plugin>
 		</plugins>
 	</build>
-	 -->
-	<!-- <build> <plugins> <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>exec-maven-plugin</artifactId> 
-		<version>1.5.0</version> <configuration> <executable>maven</executable> <mainClass>koiki.hackday2017.leap.Sample</mainClass> 
-		<additionalClasspathElements> <additionalClasspathElement>${project.basedir}/lib/LeapJava.jar</additionalClasspathElement> 
-		</additionalClasspathElements> </configuration> </plugin> </plugins> </build> -->
 </project>
