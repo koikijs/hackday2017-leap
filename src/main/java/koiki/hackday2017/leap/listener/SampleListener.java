@@ -4,7 +4,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.AsyncRestOperations;
 import org.springframework.web.client.AsyncRestTemplate;
-import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 
 import com.leapmotion.leap.Arm;
@@ -28,9 +27,39 @@ import com.leapmotion.leap.Vector;
 import koiki.hackday2017.leap.entity.Event;
 
 public class SampleListener extends Listener {
+	private final String hostname = "192.168.1.117:4567";
 	
 	private final AsyncRestOperations asyncRestOperations = new AsyncRestTemplate();
 	private final RestTemplate restTemplate = new RestTemplate();
+	
+	public SampleListener() {
+		MappingJackson2HttpMessageConverter jsonHttpMessageConverter = new MappingJackson2HttpMessageConverter();
+        restTemplate.getMessageConverters().add(jsonHttpMessageConverter);
+	}
+	
+	private void post(Event event) {
+		HttpEntity<Event> entity = new HttpEntity<>(event);
+		try {
+        	System.out.println("rest start");
+        	restTemplate.postForLocation("http://" + hostname + "/event", entity);
+        	System.out.println("rest end");
+        } catch (Exception e) {
+        	System.out.println(e);
+        }
+	}
+	
+	private void asyncPost(Event event) {
+		HttpEntity<Event> entity = new HttpEntity<>(event);
+        asyncRestOperations.postForLocation(
+        		"http://10.20.52.198:4567/event",
+        		entity).addCallback(
+        				success -> {
+        					System.out.println("success!");
+        				},
+        				failure -> {
+        					System.out.println(failure);
+        				});
+	}
 	
     public void onInit(Controller controller) {
         System.out.println("Initialized");
@@ -57,63 +86,42 @@ public class SampleListener extends Listener {
     	Frame frame = controller.frame(); // controller is a Controller object
     	HandList hands = frame.hands();
     	Hand firstHand = hands.get(0);
-    	if (firstHand.isRight()) {
-    		//System.out.println("right!");
-    	}
-    	if (firstHand.isLeft()) {
-    		//System.out.println("left!");
-    	}
     	
+    	String type = "";
         GestureList gestures = frame.gestures();
         for (int i = 0; i < gestures.count(); i++) {
             Gesture gesture = gestures.get(i);
 
             switch (gesture.type()) {
                 case TYPE_SWIPE:
-                    SwipeGesture swipe = new SwipeGesture(gesture);
-                    
-                    String type = "";;
-                	if (firstHand.isRight()) {
-                		type = "swipe-right";
-                	}
-                	if (firstHand.isLeft()) {
-                		type = "swipe-left";
-                	}
-                	
-                	Event event = new Event();
-                    event.setType(type);
-                    
-                    HttpEntity<Event> entity = new HttpEntity<>(event);
-                    
-                    MappingJackson2HttpMessageConverter jsonHttpMessageConverter = new MappingJackson2HttpMessageConverter();
-                    restTemplate.getMessageConverters().add(jsonHttpMessageConverter);
-                    
-                    try {
-                    	System.out.println("rest start");
-                    	restTemplate.postForLocation("http://10.20.52.198:4567/event", entity);
-                    	System.out.println("rest end");
-                    } catch (Exception e) {
-                    	System.out.println(e);
-                    }
-                    
-                    
-                    System.out.println("start");
-                    asyncRestOperations.postForLocation(
-                    		"http://10.20.52.198:4567/event",
-                    		entity).addCallback(
-                    				success -> {
-                    					System.out.println("success!");
-                    				},
-                    				failure -> {
-                    					System.out.println(failure);
-                    				});;
-                    System.out.println("end");
-                    break;
+                    type = "swipe";
+                	break;
+                case TYPE_CIRCLE:
+                	type = "circle";
+                	break;
+                case TYPE_SCREEN_TAP:
+                	type = "screen-tap";
+                	break;
+                case TYPE_KEY_TAP:
+                	type = "key-tap";
+                	break;
                 default:
-                    System.out.println("Unknown gesture type.");
+                	type = "unknown";
                     break;
             }
-        }       
+            
+            if (firstHand.isRight())
+        		type = type + "-right";
+            else if (firstHand.isLeft())
+        		type = type + "-left";
+            
+            Event event = new Event();
+            event.setType(type);
+            
+            post(event);
+        }
+        
+        onFrame111(controller);
     }
     
     public void onFrame111(Controller controller) {
