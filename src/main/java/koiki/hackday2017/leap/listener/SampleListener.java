@@ -121,7 +121,25 @@ public class SampleListener extends Listener {
             post(event);
         }
         
-        onFrame111(controller);
+        onFrame222(controller);
+    }
+    
+    public void onFrame222(Controller controller) {
+        // Get the most recent frame and report some basic information
+        Frame frame = controller.frame();
+
+        //Get hands
+        for(Hand hand : frame.hands()) {
+            Arm arm = hand.arm();
+            System.out.println("  Arm direction: " + arm.direction()
+                             + ", wrist position: " + arm.wristPosition()
+                             + ", elbow position: " + arm.elbowPosition());
+            
+            Event event = new Event();
+            event.setType("miss you");
+            
+            post(event);
+        }
     }
     
     public void onFrame111(Controller controller) {
