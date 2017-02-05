@@ -17,6 +17,7 @@ import com.leapmotion.leap.Gesture.State;
 import com.leapmotion.leap.GestureList;
 import com.leapmotion.leap.Hand;
 import com.leapmotion.leap.HandList;
+import com.leapmotion.leap.Image;
 import com.leapmotion.leap.KeyTapGesture;
 import com.leapmotion.leap.Listener;
 import com.leapmotion.leap.ScreenTapGesture;
@@ -27,7 +28,7 @@ import com.leapmotion.leap.Vector;
 import koiki.hackday2017.leap.entity.Event;
 
 public class SampleListener extends Listener {
-	private final String hostname = "192.168.1.117:4567";
+	private final String hostname = "35.187.203.216:4567";
 	
 	private final AsyncRestOperations asyncRestOperations = new AsyncRestTemplate();
 	private final RestTemplate restTemplate = new RestTemplate();
@@ -71,6 +72,8 @@ public class SampleListener extends Listener {
         controller.enableGesture(Gesture.Type.TYPE_CIRCLE);
         controller.enableGesture(Gesture.Type.TYPE_SCREEN_TAP);
         controller.enableGesture(Gesture.Type.TYPE_KEY_TAP);
+        
+        controller.setPolicy(Controller.PolicyFlag.POLICY_IMAGES);
     }
 
     public void onDisconnect(Controller controller) {
@@ -122,6 +125,59 @@ public class SampleListener extends Listener {
         }
         
         onFrame222(controller);
+    }
+    
+    public void onFrame555(Controller controller) {
+        // Get the most recent frame and report some basic information
+        Frame frame = controller.frame();
+
+        //Get hands
+        if (frame.isValid()) {
+            System.out.println("isValid");
+        	
+            Event event = new Event();
+            event.setType("miss you");
+            
+            post(event);
+        } else {
+        	System.out.println("isNotValid");
+        }
+    }
+    
+    public void onFrame444(Controller controller) {
+        // Get the most recent frame and report some basic information
+        Frame frame = controller.frame();
+
+        //Get hands
+        for(Image image : controller.images()) {
+            System.out.println("  rayOffsetX: " + image.rayOffsetX()
+                             + ", rayOffsetY: " + image.rayOffsetY()
+                             + ", rayScaleX: " + image.rayScaleX()
+                             + ", rayScaleY: " + image.rayScaleY());
+            
+            Event event = new Event();
+            event.setType("miss you");
+            
+            post(event);
+        }
+    }
+    
+    public void onFrame333(Controller controller) {
+        // Get the most recent frame and report some basic information
+        Frame frame = controller.frame();
+
+        //Get hands
+        for(Image image : frame.images()) {
+            System.out.println("  rayOffsetX: " + image.rayOffsetX()
+                             + ", rayOffsetY: " + image.rayOffsetY()
+                             + ", rayScaleX: " + image.rayScaleX()
+                             + ", rayScaleY: " + image.rayScaleY());
+            
+            Event event = new Event();
+            event.setType("miss you");
+            
+            post(event);
+        }
     }
     
     public void onFrame222(Controller controller) {
